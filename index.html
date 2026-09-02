@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Meesho & Flipkart Client Payment Manager</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 font-sans text-slate-100 antialiased min-h-screen pb-16">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/50 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between py-2">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                <div class="bg-gradient-to-tr from-indigo-500 to-violet-500 p-2 sm:p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/20 shrink-0">
+                    <i class="fa-solid fa-store text-base sm:text-xl"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-white text-xs sm:text-xl font-bold tracking-tight truncate">E-Commerce Ledger</h1>
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-medium truncate">Meesho & Flipkart Manager</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+                <button onclick="openAllPaymentsModal()" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span class="hidden md:inline">Audit</span>
+                </button>
+                <button onclick="clearAllDataPrompt()" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm transition flex items-center space-x-1">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span class="hidden md:inline">Clear All</span>
+                </button>
+                <button onclick="openClientModal()" class="bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-indigo-500/25 flex items-center space-x-1.5">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Add</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+        
+        <!-- Dashboard Summary Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div class="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-3.5 sm:p-5 border border-slate-700/50 shadow-xl flex items-center justify-between relative overflow-hidden">
+                <div>
+                    <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Clients</p>
+                    <h3 id="statTotalClients" class="text-xl sm:text-3xl font-extrabold text-white mt-1">0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-base sm:text-xl border border-indigo-500/20 shrink-0">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-3.5 sm:p-5 border border-slate-700/50 shadow-xl flex items-center justify-between relative overflow-hidden">
+                <div>
+                    <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Due (Month)</p>
+                    <h3 id="statTotalDue" class="text-xl sm:text-3xl font-extrabold text-amber-400 mt-1">₹0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/10 text-amber-400 rounded-2xl flex items-center justify-center text-base sm:text-xl border border-amber-500/20 shrink-0">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-3.5 sm:p-5 border border-slate-700/50 shadow-xl flex items-center justify-between relative overflow-hidden">
+                <div>
+                    <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Collected</p>
+                    <h3 id="statTotalCollected" class="text-xl sm:text-3xl font-extrabold text-emerald-400 mt-1">₹0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-base sm:text-xl border border-emerald-500/20 shrink-0">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-3.5 sm:p-5 border border-slate-700/50 shadow-xl flex items-center justify-between relative overflow-hidden">
+                <div>
+                    <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending</p>
+                    <h3 id="statTotalPending" class="text-xl sm:text-3xl font-extrabold text-rose-400 mt-1">₹0</h3>
+                </div>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-rose-500/10 text-rose-400 rounded-2xl flex items-center justify-center text-base sm:text-xl border border-rose-500/20 shrink-0">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Search Bar -->
+        <div class="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-3.5 sm:p-4 mb-6 border border-slate-700/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="relative w-full sm:w-80">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="renderClients()" placeholder="Search name, store, phone..." class="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+            </div>
+            <div class="flex items-center space-x-2.5 w-full sm:w-auto justify-between sm:justify-end">
+                <select id="platformFilter" onchange="renderClients()" class="bg-slate-900/50 border border-slate-700 text-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition flex-1 sm:flex-initial">
+                    <option value="ALL">All Platforms</option>
+                    <option value="Meesho">Meesho Only</option>
+                    <option value="Flipkart">Flipkart Only</option>
+                    <option value="Both">Both Platforms</option>
+                </select>
+                <button onclick="exportData()" class="bg-slate-700/50 hover:bg-slate-700 border border-slate-600/50 text-slate-200 px-3.5 py-2.5 rounded-xl text-sm transition flex items-center space-x-1.5 shrink-0">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Backup</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Client List Grid -->
+        <div id="clientGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <!-- Dynamic Client Cards will render here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-slate-800/40 rounded-2xl border border-slate-700/50 shadow-xl mt-4">
+            <div class="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-indigo-500/20">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">No Clients Found</h3>
+            <p class="text-sm text-slate-400 max-w-sm mx-auto mt-1 px-4">Start managing your Meesho and Flipkart clients by adding your first account record.</p>
+            <button onclick="openClientModal()" class="mt-5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">
+                Add Client Now
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Client Modal -->
+    <div id="clientModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-lg w-full overflow-hidden transform transition-all max-h-[92vh] flex flex-col">
+            <div class="px-5 sm:px-6 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between shrink-0">
+                <h3 id="modalTitle" class="font-bold text-base sm:text-lg text-white">Add New Client</h3>
+                <button onclick="closeClientModal()" class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-xl bg-slate-700/50 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="clientForm" onsubmit="handleClientSubmit(event)" class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="clientId">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Client Name *</label>
+                        <input type="text" id="clientName" required placeholder="e.g. Rahul Sharma" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Store / Business Name</label>
+                        <input type="text" id="storeName" placeholder="e.g. Royal Fashion" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Platform *</label>
+                        <select id="clientPlatform" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="Meesho" class="bg-slate-900">Meesho</option>
+                            <option value="Flipkart" class="bg-slate-900">Flipkart</option>
+                            <option value="Both" class="bg-slate-900">Both (Meesho & Flipkart)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Phone Number (WhatsApp)</label>
+                        <input type="tel" id="clientPhone" placeholder="e.g. 9876543210" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Billing Cycle Date (1-31) *</label>
+                        <input type="number" id="billingDate" min="1" max="31" required placeholder="e.g. 12" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Fee Type *</label>
+                        <select id="feeType" onchange="onFeeTypeChange()" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="Fixed" class="bg-slate-900">Fixed Monthly Fee</option>
+                            <option value="Per Listing" class="bg-slate-900">Per Listing Basis</option>
+                            <option value="Per Order" class="bg-slate-900">Per Order Basis</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div id="feeAmountGroup">
+                        <label id="feeLabel" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Monthly Agreed Fee (₹) *</label>
+                        <input type="number" id="monthlyFee" min="0" required placeholder="e.g. 5000" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div id="unitRateGroup" class="hidden">
+                        <label id="unitRateLabel" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Rate per Unit (₹) *</label>
+                        <input type="number" id="unitRate" min="0" value="0" placeholder="e.g. 20" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <div id="initialPaymentGroup">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Initial Payment Paid This Month (₹)</label>
+                    <input type="number" id="initialPaid" min="0" value="0" placeholder="e.g. 2000" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeClientModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-xs sm:text-sm hover:bg-slate-800 transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold transition shadow-lg shadow-indigo-600/30">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Record Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-md w-full overflow-hidden max-h-[92vh] flex flex-col">
+            <div class="px-5 sm:px-6 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between shrink-0">
+                <h3 class="font-bold text-base sm:text-lg text-white"><i class="fa-solid fa-indian-rupee-sign mr-2 text-emerald-400"></i>Record Payment</h3>
+                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-xl bg-slate-700/50 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="paymentForm" onsubmit="handlePaymentSubmit(event)" class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="payClientId">
+                <div>
+                    <p id="payClientInfo" class="text-xs font-semibold text-indigo-400 bg-indigo-500/10 px-3 py-2 rounded-xl border border-indigo-500/20"></p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Select Month / Cycle *</label>
+                    <select id="payMonthKey" required class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                        <!-- Dynamic Month options -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Amount (₹) *</label>
+                        <input type="number" id="payAmount" min="1" required placeholder="e.g. 2000" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Payment Mode *</label>
+                        <select id="payMode" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="UPI" class="bg-slate-900">UPI / GPay</option>
+                            <option value="Bank Transfer" class="bg-slate-900">Bank Transfer</option>
+                            <option value="Cash" class="bg-slate-900">Cash</option>
+                            <option value="Other" class="bg-slate-900">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Payment Date *</label>
+                    <input type="date" id="payDate" required class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Reference (Optional)</label>
+                    <input type="text" id="payNote" placeholder="e.g. Transaction ID / Ref No." class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-xs sm:text-sm hover:bg-slate-800 transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold transition shadow-lg shadow-emerald-600/30">Add Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Audit All Payments Modal -->
+    <div id="allPaymentsModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-5xl w-full overflow-hidden max-h-[92vh] flex flex-col">
+            <div class="px-5 sm:px-6 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between shrink-0">
+                <div>
+                    <h3 class="font-bold text-base sm:text-lg text-white">All Payments Audit</h3>
+                    <p class="text-xs text-slate-400">Track and filter all transactions by Payment Mode</p>
+                </div>
+                <button onclick="closeAllPaymentsModal()" class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-xl bg-slate-700/50 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-6 flex-1">
+                <div class="bg-slate-800/50 rounded-2xl p-3.5 sm:p-4 border border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center space-x-2.5 w-full sm:w-auto">
+                        <label class="text-xs font-semibold text-slate-400 uppercase">Filter:</label>
+                        <select id="auditModeFilter" onchange="renderAuditPayments()" class="bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:border-indigo-500 transition flex-1 sm:flex-initial">
+                            <option value="ALL">All Modes</option>
+                            <option value="UPI">UPI / GPay</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="text-xs sm:text-sm font-semibold text-emerald-400 self-end sm:self-auto">
+                        Total Collected: <span id="auditTotalSum" class="text-base font-bold">₹0</span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-700/60 rounded-2xl">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[650px]">
+                        <thead>
+                            <tr class="bg-slate-800/80 text-slate-300 text-[11px] uppercase font-bold tracking-wider">
+                                <th class="p-3 border-b border-slate-700">Date</th>
+                                <th class="p-3 border-b border-slate-700">Client Name</th>
+                                <th class="p-3 border-b border-slate-700">Month</th>
+                                <th class="p-3 border-b border-slate-700">Mode</th>
+                                <th class="p-3 border-b border-slate-700 text-right">Amount</th>
+                                <th class="p-3 border-b border-slate-700">Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTableBody" class="divide-y divide-slate-800">
+                            <!-- Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="px-5 sm:px-6 py-3.5 bg-slate-800 border-t border-slate-700 flex justify-end shrink-0">
+                <button onclick="closeAllPaymentsModal()" class="px-5 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Ledger History Modal -->
+    <div id="ledgerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-4xl w-full overflow-hidden max-h-[92vh] flex flex-col">
+            <div class="px-5 sm:px-6 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between shrink-0">
+                <div class="pr-2 min-w-0">
+                    <h3 id="ledgerModalTitle" class="font-bold text-sm sm:text-lg text-white truncate">Client Detailed Ledger</h3>
+                    <p id="ledgerModalSubtitle" class="text-[11px] sm:text-xs text-slate-400 truncate">Monthly breakdown & payment history</p>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                    <button onclick="downloadClientStatement()" title="Download Statement" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center space-x-1">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span class="hidden sm:inline">Statement</span>
+                    </button>
+                    <button onclick="closeLedgerModal()" class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-xl bg-slate-700/50 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-6 flex-1">
+                <div class="bg-slate-800/50 rounded-2xl p-3.5 sm:p-4 border border-slate-700/60 grid grid-cols-3 gap-2.5 text-center">
+                    <div>
+                        <span class="text-[10px] sm:text-xs text-slate-400 block uppercase font-semibold">Fee Structure</span>
+                        <span id="ledgerMonthlyFee" class="text-xs sm:text-lg font-bold text-white mt-0.5 sm:mt-1 block truncate">₹0</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] sm:text-xs text-slate-400 block uppercase font-semibold">Cycle Reset</span>
+                        <span id="ledgerBillingDate" class="text-xs sm:text-lg font-bold text-indigo-400 mt-0.5 sm:mt-1 block">Day 12</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] sm:text-xs text-slate-400 block uppercase font-semibold">Current Pending</span>
+                        <span id="ledgerTotalPending" class="text-xs sm:text-lg font-bold text-rose-400 mt-0.5 sm:mt-1 block">₹0</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                        <h4 class="font-bold text-white text-xs sm:text-sm">Monthly Breakdown History</h4>
+                        <button onclick="openAddMonthModal()" class="text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-semibold px-3 py-1.5 rounded-xl transition self-start sm:self-auto flex items-center space-x-1">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Month Bill</span>
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto border border-slate-700/60 rounded-2xl">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[550px]">
+                            <thead>
+                                <tr class="bg-slate-800/80 text-slate-300 text-[11px] uppercase font-bold tracking-wider">
+                                    <th class="p-3 border-b border-slate-700">Month</th>
+                                    <th class="p-3 border-b border-slate-700">Cycle Range</th>
+                                    <th class="p-3 border-b border-slate-700 text-right">Fee Due</th>
+                                    <th class="p-3 border-b border-slate-700 text-right">Paid</th>
+                                    <th class="p-3 border-b border-slate-700 text-right">Balance</th>
+                                    <th class="p-3 border-b border-slate-700 text-center">Status</th>
+                                    <th class="p-3 border-b border-slate-700 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerTableBody" class="divide-y divide-slate-800">
+                                <!-- Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-xs sm:text-sm mb-3">All Recorded Payments</h4>
+                    <div id="ledgerPaymentList" class="space-y-2">
+                        <!-- Payments -->
+                    </div>
+                </div>
+            </div>
+            <div class="px-5 sm:px-6 py-3.5 bg-slate-800 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+                <button onclick="sendWhatsAppReminderFromLedger()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-600/20">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span>WhatsApp Reminder</span>
+                </button>
+                <button onclick="closeLedgerModal()" class="w-full sm:w-auto px-5 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-xl transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Month Modal -->
+    <div id="customMonthModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-sm w-full overflow-hidden">
+            <div class="px-5 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+                <h3 class="font-bold text-base text-white">Add/Edit Month Bill</h3>
+                <button onclick="closeCustomMonthModal()" class="text-slate-400 hover:text-white text-lg w-8 h-8 rounded-xl bg-slate-700/50 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="customMonthForm" onsubmit="handleCustomMonthSubmit(event)" class="p-5 space-y-4">
+                <input type="hidden" id="cmClientId">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Month Identifier *</label>
+                    <input type="text" id="cmMonthKey" required placeholder="e.g. October 2026" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+                <div id="cmUnitInputGroup" class="hidden">
+                    <label id="cmUnitLabel" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Units *</label>
+                    <input type="number" id="cmUnits" min="0" placeholder="e.g. 150" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition" oninput="calculateUnitModalTotal()">
+                </div>
+                <div>
+                    <label id="cmFeeLabel" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Fee Due (₹) *</label>
+                    <input type="number" id="cmFeeAmount" min="0" required placeholder="e.g. 5000" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeCustomMonthModal()" class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 text-xs hover:bg-slate-800 transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-600/30">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Notification/Message Box Modal -->
+    <div id="msgModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-sm w-full p-6 text-center">
+            <div id="msgIcon" class="w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-indigo-500/20">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="msgTitle" class="text-lg font-bold text-white mb-1">Notification</h3>
+            <p id="msgText" class="text-sm text-slate-400 mb-6">Message goes here...</p>
+            <button onclick="closeMsgModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">OK</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl border border-slate-700 max-w-sm w-full p-6 text-center">
+            <div class="w-16 h-16 bg-rose-500/10 text-rose-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-rose-500/20">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="confirmTitle" class="text-lg font-bold text-white mb-1">Confirmation</h3>
+            <p id="confirmText" class="text-sm text-slate-400 mb-6">Are you sure?</p>
+            <div class="flex items-center space-x-3">
+                <button onclick="closeConfirmModal(false)" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-sm transition">Cancel</button>
+                <button id="confirmYesBtn" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-lg shadow-rose-600/30">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clients = [];
+        let activeLedgerClientId = null;
+        let confirmCallback = null;
+
+        window.onload = function() {
+            loadData();
+            renderClients();
+            updateDashboardStats();
+        };
+
+        function showMessage(title, text, type = 'info') {
+            const modal = document.getElementById('msgModal');
+            document.getElementById('msgTitle').innerText = title;
+            document.getElementById('msgText').innerText = text;
+            const iconDiv = document.getElementById('msgIcon');
+            if(type === 'success') {
+                iconDiv.className = "w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-emerald-500/20";
+                iconDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else if(type === 'error') {
+                iconDiv.className = "w-16 h-16 bg-rose-500/10 text-rose-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-rose-500/20";
+                iconDiv.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+            } else {
+                iconDiv.className = "w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-indigo-500/20";
+                iconDiv.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('msgModal').classList.add('hidden');
+        }
+
+        function showConfirm(title, text, onYes) {
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmText').innerText = text;
+            confirmCallback = onYes;
+            document.getElementById('confirmYesBtn').onclick = function() {
+                closeConfirmModal(true);
+            };
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal(isYes) {
+            document.getElementById('confirmModal').classList.add('hidden');
+            if (isYes && typeof confirmCallback === 'function') {
+                confirmCallback();
+            }
+            confirmCallback = null;
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('ecommerce_clients_ledger_data');
+            if (saved) {
+                try {
+                    clients = JSON.parse(saved);
+                } catch(e) {
+                    clients = [];
+                }
+            } else {
+                clients = [];
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('ecommerce_clients_ledger_data', JSON.stringify(clients));
+            updateDashboardStats();
+        }
+
+        function clearAllDataPrompt() {
+            showConfirm('Clear All Data', 'Kya aap waqai saara data delete karna chahte hain? Yeh action wapas nahi ho sakta!', function() {
+                clients = [];
+                saveData();
+                renderClients();
+                updateDashboardStats();
+                if (activeLedgerClientId) {
+                    closeLedgerModal();
+                }
+                showMessage('Cleared', 'Saara data successfully clear kar diya gaya hai.', 'success');
+            });
+        }
+
+        function getCurrentMonthKey() {
+            const now = new Date();
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            return months[now.getMonth()] + " " + now.getFullYear();
+        }
+
+        function getRecentMonthsList() {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const list = [];
+            const now = new Date();
+            let year = now.getFullYear();
+            let monthIdx = now.getMonth();
+
+            for (let i = -5; i <= 2; i++) {
+                let m = monthIdx + i;
+                let y = year;
+                while (m < 0) { m += 12; y -= 1; }
+                while (m > 11) { m -= 12; y += 1; }
+                list.push(months[m] + " " + y);
+            }
+            return list;
+        }
+
+        function onFeeTypeChange() {
+            const feeType = document.getElementById('feeType').value;
+            const unitRateGroup = document.getElementById('unitRateGroup');
+            const feeLabel = document.getElementById('feeLabel');
+            const monthlyFeeInput = document.getElementById('monthlyFee');
+
+            if (feeType === 'Fixed') {
+                unitRateGroup.classList.add('hidden');
+                feeLabel.innerText = 'Monthly Agreed Fee (₹) *';
+                monthlyFeeInput.placeholder = 'e.g. 5000';
+            } else if (feeType === 'Per Listing') {
+                unitRateGroup.classList.remove('hidden');
+                feeLabel.innerText = 'Base Fee / Min Guarantee (₹)';
+                monthlyFeeInput.placeholder = 'e.g. 0 or 2000';
+            } else if (feeType === 'Per Order') {
+                unitRateGroup.classList.remove('hidden');
+                feeLabel.innerText = 'Base Fee / Min Guarantee (₹)';
+                monthlyFeeInput.placeholder = 'e.g. 0 or 3000';
+            }
+        }
+
+        function calculateClientFinances(client) {
+            let monthKeysSet = new Set();
+            monthKeysSet.add(getCurrentMonthKey());
+            
+            if (client.customMonths) {
+                Object.keys(client.customMonths).forEach(k => monthKeysSet.add(k));
+            }
+            if (client.payments) {
+                client.payments.forEach(p => { if(p.monthKey) monthKeysSet.add(p.monthKey); });
+            }
+
+            getRecentMonthsList().forEach(m => monthKeysSet.add(m));
+
+            const currMonth = getCurrentMonthKey();
+            let currentMonthFee = 0;
+            if (client.customMonths && client.customMonths[currMonth] !== undefined) {
+                currentMonthFee = Number(client.customMonths[currMonth]);
+            } else {
+                currentMonthFee = Number(client.monthlyFee);
+            }
+            
+            let currentMonthPaid = 0;
+            if (client.payments) {
+                client.payments.filter(p => p.monthKey === currMonth).forEach(p => {
+                    currentMonthPaid += Number(p.amount) || 0;
+                });
+            }
+
+            let currentMonthPending = Math.max(0, currentMonthFee - currentMonthPaid);
+
+            const today = new Date().getDate();
+            const billingDay = Number(client.billingDate) || 1;
+            let diff = billingDay - today;
+            let isApproaching = (diff >= 0 && diff <= 2) || (diff < 0 && diff >= -2);
+
+            return {
+                currentMonthFee: currentMonthFee,
+                currentMonthPaid: currentMonthPaid,
+                currentMonthPending: currentMonthPending,
+                isApproaching: isApproaching,
+                monthKeysSet: Array.from(monthKeysSet)
+            };
+        }
+
+        function updateDashboardStats() {
+            let totalClients = clients.length;
+            let totalDueThisMonth = 0;
+            let totalCollectedThisMonth = 0;
+            let totalPendingThisMonth = 0;
+
+            clients.forEach(c => {
+                const fin = calculateClientFinances(c);
+                totalDueThisMonth += fin.currentMonthFee;
+                totalCollectedThisMonth += fin.currentMonthPaid;
+                totalPendingThisMonth += fin.currentMonthPending;
+            });
+
+            document.getElementById('statTotalClients').innerText = totalClients;
+            document.getElementById('statTotalDue').innerText = '₹' + totalDueThisMonth.toLocaleString('en-IN');
+            document.getElementById('statTotalCollected').innerText = '₹' + totalCollectedThisMonth.toLocaleString('en-IN');
+            document.getElementById('statTotalPending').innerText = '₹' + totalPendingThisMonth.toLocaleString('en-IN');
+        }
+
+        function renderClients() {
+            const grid = document.getElementById('clientGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
+            const platformVal = document.getElementById('platformFilter') ? document.getElementById('platformFilter').value : 'ALL';
+
+            grid.innerHTML = '';
+
+            const filtered = clients.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(searchVal) || 
+                                      (c.storeName && c.storeName.toLowerCase().includes(searchVal)) || 
+                                      (c.phone && c.phone.includes(searchVal));
+                const matchesPlatform = platformVal === 'ALL' || c.platform === platformVal || c.platform === 'Both';
+                return matchesSearch && matchesPlatform;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                grid.classList.remove('hidden');
+            }
+
+            filtered.forEach(client => {
+                const fin = calculateClientFinances(client);
+                
+                let badgeBg = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                let iconClass = 'fa-solid fa-store';
+                if (client.platform === 'Flipkart') {
+                    badgeBg = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                    iconClass = 'fa-solid fa-bag-shopping';
+                } else if (client.platform === 'Both') {
+                    badgeBg = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+                    iconClass = 'fa-solid fa-shop';
+                } else if (client.platform === 'Meesho') {
+                    badgeBg = 'bg-pink-500/10 text-pink-400 border-pink-500/20';
+                    iconClass = 'fa-solid fa-cart-shopping';
+                }
+
+                let feeTypeLabel = client.feeType || 'Fixed';
+                let feeDetailText = feeTypeLabel === 'Fixed' ? `₹${Number(client.monthlyFee).toLocaleString('en-IN')}` : `${feeTypeLabel} (₹${client.unitRate}/unit)`;
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-800/60 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-700/60 hover:border-slate-600 transition flex flex-col justify-between overflow-hidden group relative";
+                
+                let approachingBadge = fin.isApproaching ? `
+                    <span class="absolute top-4 right-4 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">
+                        <i class="fa-solid fa-bell mr-1"></i> Due Soon
+                    </span>
+                ` : '';
+
+                card.innerHTML = `
+                    ${approachingBadge}
+                    <div class="p-4 sm:p-5">
+                        <div class="flex items-start justify-between mb-3 pr-14">
+                            <div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeBg} mb-2">
+                                    <i class="${iconClass} mr-1"></i> ${client.platform}
+                                </span>
+                                <h3 class="font-bold text-white text-base sm:text-lg tracking-tight">${escapeHtml(client.name)}</h3>
+                                <p class="text-xs text-slate-400 font-medium mt-0.5">${escapeHtml(client.storeName || 'No store')} ${client.phone ? '• ' + escapeHtml(client.phone) : ''}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between space-x-1.5 mb-3">
+                            <button onclick="sendWhatsAppReminder('${client.id}')" title="WhatsApp Reminder" class="flex-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 py-2 px-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                                <span class="truncate">Reminder</span>
+                            </button>
+                            <div class="flex items-center space-x-1 shrink-0">
+                                <button onclick="openEditClientModal('${client.id}')" title="Edit" class="w-8 h-8 rounded-xl bg-slate-700/40 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-pen text-xs"></i>
+                                </button>
+                                <button onclick="deleteClient('${client.id}')" title="Delete" class="w-8 h-8 rounded-xl bg-slate-700/40 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 my-3 bg-slate-900/50 p-3 rounded-2xl border border-slate-800 text-xs">
+                            <div>
+                                <span class="text-slate-500 block font-semibold text-[10px] uppercase tracking-wider">Billing Reset</span>
+                                <span class="font-bold text-slate-200 text-xs mt-0.5 block"><i class="fa-regular fa-calendar text-indigo-400 mr-1"></i> Day ${client.billingDate}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block font-semibold text-[10px] uppercase tracking-wider">Fee Structure</span>
+                                <span class="font-bold text-indigo-300 text-xs mt-0.5 block truncate">${feeDetailText}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-xs">
+                            <div class="flex justify-between py-1 border-b border-slate-700/50">
+                                <span class="text-slate-400 font-medium">This Month Fee:</span>
+                                <span class="font-semibold text-slate-200">₹${fin.currentMonthFee.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-700/50">
+                                <span class="text-slate-400 font-medium">Paid This Month:</span>
+                                <span class="font-semibold text-emerald-400">₹${fin.currentMonthPaid.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="flex justify-between py-1 font-medium">
+                                <span class="text-slate-300">Pending This Month:</span>
+                                <span class="font-bold text-sm ${fin.currentMonthPending > 0 ? 'text-rose-400' : 'text-emerald-400'}">₹${fin.currentMonthPending.toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-4 sm:px-5 py-3.5 bg-slate-900/40 border-t border-slate-700/50 flex items-center gap-2">
+                        <button onclick="openPaymentModal('${client.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 px-2 rounded-xl text-xs transition flex items-center justify-center space-x-1 shadow-lg shadow-emerald-600/20">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>Pay</span>
+                        </button>
+                        <button onclick="openLedgerModal('${client.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 font-semibold py-2.5 px-2 rounded-xl text-xs transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Ledger</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openAllPaymentsModal() {
+            renderAuditPayments();
+            document.getElementById('allPaymentsModal').classList.remove('hidden');
+        }
+
+        function closeAllPaymentsModal() {
+            document.getElementById('allPaymentsModal').classList.add('hidden');
+        }
+
+        function renderAuditPayments() {
+            const filterMode = document.getElementById('auditModeFilter') ? document.getElementById('auditModeFilter').value : 'ALL';
+            const tbody = document.getElementById('auditTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            let allPayments = [];
+            clients.forEach(c => {
+                if (c.payments) {
+                    c.payments.forEach(p => {
+                        allPayments.push({
+                            ...p,
+                            clientName: c.name,
+                            storeName: c.storeName || c.platform
+                        });
+                    });
+                }
+            });
+
+            const filtered = allPayments.filter(p => {
+                const mode = p.mode || 'UPI';
+                return filterMode === 'ALL' || mode === filterMode;
+            });
+
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let totalSum = 0;
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 italic text-xs">No payments found.</td></tr>`;
+            } else {
+                filtered.forEach(p => {
+                    totalSum += Number(p.amount) || 0;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/50 transition text-xs";
+                    tr.innerHTML = `
+                        <td class="p-3 text-slate-300 whitespace-nowrap">${p.date}</td>
+                        <td class="p-3 font-bold text-white whitespace-nowrap">${escapeHtml(p.clientName)}</td>
+                        <td class="p-3 text-slate-300 whitespace-nowrap">${p.monthKey}</td>
+                        <td class="p-3 whitespace-nowrap"><span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-300 rounded-full text-[10px] font-semibold border border-indigo-500/20">${p.mode || 'UPI'}</span></td>
+                        <td class="p-3 text-right font-bold text-emerald-400 whitespace-nowrap">₹${Number(p.amount).toLocaleString('en-IN')}</td>
+                        <td class="p-3 text-slate-400">${escapeHtml(p.note || '-')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            if(document.getElementById('auditTotalSum')) document.getElementById('auditTotalSum').innerText = '₹' + totalSum.toLocaleString('en-IN');
+        }
+
+        function openClientModal() {
+            document.getElementById('clientId').value = '';
+            document.getElementById('modalTitle').innerText = 'Add New Client';
+            document.getElementById('clientForm').reset();
+            document.getElementById('feeType').value = 'Fixed';
+            onFeeTypeChange();
+            document.getElementById('initialPaymentGroup').style.display = 'block';
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+
+        function openEditClientModal(id) {
+            const client = clients.find(c => c.id === id);
+            if (!client) return;
+
+            document.getElementById('clientId').value = client.id;
+            document.getElementById('modalTitle').innerText = 'Edit Client Details';
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('storeName').value = client.storeName || '';
+            document.getElementById('clientPlatform').value = client.platform;
+            document.getElementById('clientPhone').value = client.phone || '';
+            document.getElementById('billingDate').value = client.billingDate;
+            document.getElementById('feeType').value = client.feeType || 'Fixed';
+            document.getElementById('monthlyFee').value = client.monthlyFee;
+            document.getElementById('unitRate').value = client.unitRate || 0;
+            onFeeTypeChange();
+            document.getElementById('initialPaymentGroup').style.display = 'none';
+
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+
+        function closeClientModal() {
+            document.getElementById('clientModal').classList.add('hidden');
+        }
+
+        function handleClientSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('clientId').value;
+            const name = document.getElementById('clientName').value.trim();
+            const storeName = document.getElementById('storeName').value.trim();
+            const platform = document.getElementById('clientPlatform').value;
+            const phone = document.getElementById('clientPhone').value.trim();
+            const billingDate = parseInt(document.getElementById('billingDate').value);
+            const feeType = document.getElementById('feeType').value;
+            const monthlyFee = parseFloat(document.getElementById('monthlyFee').value) || 0;
+            const unitRate = parseFloat(document.getElementById('unitRate').value) || 0;
+            const initialPaid = parseFloat(document.getElementById('initialPaid').value) || 0;
+
+            if (id) {
+                const client = clients.find(c => c.id === id);
+                if (client) {
+                    client.name = name;
+                    client.storeName = storeName;
+                    client.platform = platform;
+                    client.phone = phone;
+                    client.billingDate = billingDate;
+                    client.feeType = feeType;
+                    client.monthlyFee = monthlyFee;
+                    client.unitRate = unitRate;
+                }
+                showMessage('Success', 'Client details updated successfully!', 'success');
+            } else {
+                const newClient = {
+                    id: 'client_' + Date.now(),
+                    name,
+                    storeName,
+                    platform,
+                    phone,
+                    billingDate,
+                    feeType,
+                    monthlyFee,
+                    unitRate,
+                    customMonths: {},
+                    payments: []
+                };
+
+                if (initialPaid > 0) {
+                    newClient.payments.push({
+                        id: 'pay_' + Date.now(),
+                        monthKey: getCurrentMonthKey(),
+                        amount: initialPaid,
+                        mode: 'UPI',
+                        date: new Date().toISOString().split('T')[0],
+                        note: 'Initial payment at registration'
+                    });
+                }
+
+                clients.push(newClient);
+                showMessage('Success', 'New client added successfully!', 'success');
+            }
+
+            saveData();
+            closeClientModal();
+            renderClients();
+        }
+
+        function deleteClient(id) {
+            showConfirm('Delete Client', 'Kya aap waqai is client ko delete karna chahte hain?', function() {
+                clients = clients.filter(c => c.id !== id);
+                saveData();
+                renderClients();
+                if (activeLedgerClientId === id) {
+                    closeLedgerModal();
+                }
+                showMessage('Deleted', 'Client successfully remove kar diya gaya hai.', 'success');
+            });
+        }
+
+        function openPaymentModal(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            document.getElementById('payClientId').value = client.id;
+            document.getElementById('payClientInfo').innerText = `Client: ${client.name} (${client.storeName || client.platform})`;
+            document.getElementById('payAmount').value = client.feeType === 'Fixed' ? client.monthlyFee : '';
+            document.getElementById('payDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('payMode').value = 'UPI';
+            document.getElementById('payNote').value = '';
+
+            const monthSelect = document.getElementById('payMonthKey');
+            monthSelect.innerHTML = '';
+            const fin = calculateClientFinances(client);
+            fin.monthKeysSet.forEach(mk => {
+                const opt = document.createElement('option');
+                opt.value = mk;
+                opt.className = "bg-slate-900 text-white";
+                opt.innerText = mk + (mk === getCurrentMonthKey() ? ' (Current)' : '');
+                if (mk === getCurrentMonthKey()) opt.selected = true;
+                monthSelect.appendChild(opt);
+            });
+
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function handlePaymentSubmit(e) {
+            e.preventDefault();
+            const clientId = document.getElementById('payClientId').value;
+            const monthKey = document.getElementById('payMonthKey').value;
+            const amount = parseFloat(document.getElementById('payAmount').value);
+            const mode = document.getElementById('payMode').value;
+            const date = document.getElementById('payDate').value;
+            const note = document.getElementById('payNote').value.trim();
+
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            if (!client.payments) client.payments = [];
+            
+            client.payments.push({
+                id: 'pay_' + Date.now(),
+                monthKey,
+                amount,
+                mode,
+                date,
+                note
+            });
+
+            saveData();
+            closePaymentModal();
+            renderClients();
+            
+            if (activeLedgerClientId === clientId) {
+                openLedgerModal(clientId);
+            }
+
+            showMessage('Payment Recorded', `Successfully recorded ₹${amount.toLocaleString('en-IN')} (${mode}) for ${monthKey}`, 'success');
+        }
+
+        function deletePayment(clientId, paymentId) {
+            showConfirm('Delete Payment', 'Kya aap waqai is payment record ko delete karna chahte hain?', function() {
+                const client = clients.find(c => c.id === clientId);
+                if (!client) return;
+
+                client.payments = client.payments.filter(p => p.id !== paymentId);
+                saveData();
+                renderClients();
+                if (activeLedgerClientId === clientId) {
+                    openLedgerModal(clientId);
+                }
+                showMessage('Deleted', 'Payment record deleted successfully.', 'success');
+            });
+        }
+
+        function sendWhatsAppReminder(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            const fin = calculateClientFinances(client);
+            if (fin.currentMonthPending <= 0) {
+                showMessage('All Clear', 'Is client ka is mahine ka koi bhi payment pending nahi hai!', 'success');
+                return;
+            }
+
+            let phone = client.phone ? client.phone.replace(/[^0-9]/g, '') : '';
+            if (phone && phone.length === 10) {
+                phone = '91' + phone;
+            }
+
+            const msg = `Hello ${client.name}, aapka ${client.platform} account management ka is mahine (${getCurrentMonthKey()}) ka ₹${fin.currentMonthPending.toLocaleString('en-IN')} fees pending hai. Kripya jald se jald payment complete karein. Thank you!`;
+            
+            const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+        }
+
+        function sendWhatsAppReminderFromLedger() {
+            if (activeLedgerClientId) {
+                sendWhatsAppReminder(activeLedgerClientId);
+            }
+        }
+
+        function downloadClientStatement() {
+            const client = clients.find(c => c.id === activeLedgerClientId);
+            if (!client) return;
+
+            const fin = calculateClientFinances(client);
+            let statementText = `=== E-COMMERCE CLIENT STATEMENT ===\n`;
+            statementText += `Client Name: ${client.name}\n`;
+            statementText += `Store Name: ${client.storeName || 'N/A'}\n`;
+            statementText += `Platform: ${client.platform}\n`;
+            statementText += `Fee Structure: ${client.feeType || 'Fixed'} (${client.feeType === 'Fixed' ? 'INR ' + client.monthlyFee : 'Rate: INR ' + client.unitRate})\n`;
+            statementText += `Current Pending: INR ${fin.currentMonthPending}\n`;
+            statementText += `----------------------------------------\n`;
+            statementText += `PAYMENT HISTORY:\n`;
+
+            if (client.payments && client.payments.length > 0) {
+                client.payments.forEach(p => {
+                    statementText += `• Date: ${p.date} | Month: ${p.monthKey} | Amount: INR ${p.amount} | Mode: ${p.mode || 'UPI'} ${p.note ? '| Note: ' + p.note : ''}\n`;
+                });
+            } else {
+                statementText += `No payments recorded yet.\n`;
+            }
+            statementText += `========================================\n`;
+
+            const blob = new Blob([statementText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${client.name.replace(/\s+/g, '_')}_Statement.txt`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function openLedgerModal(clientId) {
+            activeLedgerClientId = clientId;
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            document.getElementById('ledgerModalTitle').innerText = `${client.name} - Ledger`;
+            document.getElementById('ledgerModalSubtitle').innerText = `${client.storeName ? client.storeName + ' • ' : ''}Platform: ${client.platform}`;
+            document.getElementById('ledgerMonthlyFee').innerText = client.feeType === 'Fixed' ? '₹' + Number(client.monthlyFee).toLocaleString('en-IN') : `${client.feeType} (₹${client.unitRate})`;
+            document.getElementById('ledgerBillingDate').innerText = `Day ${client.billingDate}`;
+
+            const fin = calculateClientFinances(client);
+            document.getElementById('ledgerTotalPending').innerText = '₹' + fin.currentMonthPending.toLocaleString('en-IN');
+
+            const tbody = document.getElementById('ledgerTableBody');
+            tbody.innerHTML = '';
+
+            let sortedMonths = fin.monthKeysSet.sort((a, b) => {
+                const dateA = new Date(a);
+                const dateB = new Date(b);
+                return dateB - dateA;
+            });
+
+            sortedMonths.forEach(mk => {
+                let fee = 0;
+                if (client.customMonths && client.customMonths[mk] !== undefined) {
+                    fee = Number(client.customMonths[mk]);
+                } else {
+                    fee = Number(client.monthlyFee);
+                }
+
+                let paid = 0;
+                if (client.payments) {
+                    client.payments.filter(p => p.monthKey === mk).forEach(p => paid += Number(p.amount));
+                }
+                let balance = fee - paid;
+
+                let cycleText = getCycleDateRangeString(mk, client.billingDate);
+
+                let statusBadge = '';
+                if (paid >= fee && fee > 0) {
+                    statusBadge = '<span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] font-bold">Paid Full</span>';
+                } else if (paid > 0) {
+                    statusBadge = '<span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-[10px] font-bold">Partial</span>';
+                } else {
+                    statusBadge = '<span class="px-2 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full text-[10px] font-bold">Pending</span>';
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition text-xs";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white whitespace-nowrap">${mk}</td>
+                    <td class="p-3 text-slate-400 whitespace-nowrap">${cycleText}</td>
+                    <td class="p-3 text-right font-semibold text-slate-200 whitespace-nowrap">₹${fee.toLocaleString('en-IN')}</td>
+                    <td class="p-3 text-right font-semibold text-emerald-400 whitespace-nowrap">₹${paid.toLocaleString('en-IN')}</td>
+                    <td class="p-3 text-right font-bold whitespace-nowrap ${balance > 0 ? 'text-rose-400' : 'text-slate-300'}">₹${balance.toLocaleString('en-IN')}</td>
+                    <td class="p-3 text-center whitespace-nowrap">${statusBadge}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="openCustomMonthModalForMonth('${client.id}', '${mk}', ${fee})" title="Edit Month Bill" class="text-indigo-400 hover:text-indigo-300 p-1.5 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const payList = document.getElementById('ledgerPaymentList');
+            payList.innerHTML = '';
+            if (!client.payments || client.payments.length === 0) {
+                payList.innerHTML = '<p class="text-xs text-slate-500 italic">No payments recorded yet.</p>';
+            } else {
+                client.payments.slice().reverse().forEach(pay => {
+                    const item = document.createElement('div');
+                    item.className = "flex items-center justify-between p-3 bg-slate-800/50 rounded-2xl border border-slate-700/60 text-xs gap-2";
+                    item.innerHTML = `
+                        <div class="flex items-center space-x-2.5 min-w-0">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">
+                                ₹
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-white truncate">₹${Number(pay.amount).toLocaleString('en-IN')} <span class="font-normal text-slate-400">for <b>${pay.monthKey}</b></span></p>
+                                <p class="text-[10px] text-slate-500 truncate mt-0.5">Date: ${pay.date} | Mode: ${pay.mode || 'UPI'}</p>
+                            </div>
+                        </div>
+                        <button onclick="deletePayment('${client.id}', '${pay.id}')" class="text-slate-400 hover:text-rose-400 p-2 rounded-xl bg-slate-700/30 hover:bg-rose-500/10 shrink-0 transition" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    `;
+                    payList.appendChild(item);
+                });
+            }
+
+            document.getElementById('ledgerModal').classList.remove('hidden');
+        }
+
+        function closeLedgerModal() {
+            activeLedgerClientId = null;
+            document.getElementById('ledgerModal').classList.add('hidden');
+        }
+
+        function getCycleDateRangeString(monthKeyStr, billingDay) {
+            try {
+                const parts = monthKeyStr.split(' ');
+                const monthName = parts[0];
+                const year = parseInt(parts[1]);
+                const monthsMap = { "January":0, "February":1, "March":2, "April":3, "May":4, "June":5, "July":6, "August":7, "September":8, "October":9, "November":10, "December":11 };
+                const mIdx = monthsMap[monthName];
+                
+                if (mIdx === undefined || isNaN(year)) return monthKeyStr;
+
+                const startDt = new Date(year, mIdx, billingDay);
+                const endDt = new Date(year, mIdx + 1, billingDay - 1);
+
+                const formatDate = (d) => {
+                    const days = d.getDate();
+                    const mShorts = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                    return days + ' ' + mShorts[d.getMonth()];
+                };
+
+                return formatDate(startDt) + ' - ' + formatDate(endDt);
+            } catch(e) {
+                return monthKeyStr;
+            }
+        }
+
+        function openAddMonthModal() {
+            if (!activeLedgerClientId) return;
+            openCustomMonthModalForMonth(activeLedgerClientId, getCurrentMonthKey(), '');
+        }
+
+        function openCustomMonthModalForMonth(clientId, monthKey, defaultFee) {
+            const client = clients.find(c => c.id === clientId);
+            document.getElementById('cmClientId').value = clientId;
+            document.getElementById('cmMonthKey').value = monthKey;
+            
+            const unitGroup = document.getElementById('cmUnitInputGroup');
+            const unitLabel = document.getElementById('cmUnitLabel');
+            
+            if (client && client.feeType && client.feeType !== 'Fixed') {
+                unitGroup.classList.remove('hidden');
+                unitLabel.innerText = `Total ${client.feeType}s this Month *`;
+                document.getElementById('cmUnits').value = '';
+                document.getElementById('cmFeeAmount').value = defaultFee !== '' ? defaultFee : client.monthlyFee;
+            } else {
+                unitGroup.classList.add('hidden');
+                document.getElementById('cmFeeAmount').value = defaultFee !== '' ? defaultFee : 5000;
+            }
+
+            document.getElementById('customMonthModal').classList.remove('hidden');
+        }
+
+        function calculateUnitModalTotal() {
+            const client = clients.find(c => c.id === activeLedgerClientId);
+            if (!client || client.feeType === 'Fixed') return;
+
+            const units = parseFloat(document.getElementById('cmUnits').value) || 0;
+            const rate = Number(client.unitRate) || 0;
+            const base = Number(client.monthlyFee) || 0;
+
+            const total = base + (units * rate);
+            document.getElementById('cmFeeAmount').value = total;
+        }
+
+        function closeCustomMonthModal() {
+            document.getElementById('customMonthModal').classList.add('hidden');
+        }
+
+        function handleCustomMonthSubmit(e) {
+            e.preventDefault();
+            const clientId = document.getElementById('cmClientId').value;
+            const monthKey = document.getElementById('cmMonthKey').value.trim();
+            const feeAmount = parseFloat(document.getElementById('cmFeeAmount').value);
+
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            if (!client.customMonths) client.customMonths = {};
+            client.customMonths[monthKey] = feeAmount;
+
+            saveData();
+            closeCustomMonthModal();
+            renderClients();
+            if (activeLedgerClientId === clientId) {
+                openLedgerModal(clientId);
+            }
+            showMessage('Success', `Month bill updated successfully!`, 'success');
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(clients, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "ecommerce_clients_ledger_" + new Date().toISOString().split('T')[0] + ".json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js").catch(err => console.error("Service Worker registration failed:", err));
+            });
+        }
+    </script>
+</body>
+</html>
